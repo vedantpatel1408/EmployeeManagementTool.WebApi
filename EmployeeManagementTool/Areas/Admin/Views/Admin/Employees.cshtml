@@ -1,0 +1,144 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutforAdminPanel.cshtml";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" /> 
+
+<div class="content-wrapper">
+    <section class="content-header"></section>
+    <h2>Employee List</h2>
+    <section class="content">
+        <table class="table" id="DatatableForEmployeesList">
+            <thead>
+                <tr>
+                    <th scope="col">Employee Id</th>
+                    <th scope="col">FirstName</th>
+                    <th scope="col">LastName</th>
+                    <th scope="col">Email Id</th>
+                    <th scope="col">DOB</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var Employee in Model)
+                {
+                    <tr>
+                        <th>@Employee.EmpId</th>
+                        <td>@Employee.Firstname</td>
+                        <td>@Employee.Lastname</td>
+                        <td>@Employee.Email</td>
+                        <td>@Employee.Dob.ToString().Substring(0,10)</td>
+                        <td>@Employee.Gender</td>
+                        <td class="d-flex">
+                            <button class="btn LockUnLockAccount" type="button" value="@Employee.EmpId" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                @if (@Employee.IsLocked == true)
+                                {
+                                    <i class="bi bi-lock"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-unlock"></i>
+                                }
+                            </button>
+                            <button class="btn DeleteEmployeeId" data-bs-toggle="modal" data-bs-target="#DeleteEmployee" value="@Employee.EmpId"><i class="bi bi-trash3"></i></button>
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+
+
+        <!-- Modal For Chnage Lock Status -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+
+                    <div class="modal-body">
+                        Are you sure to Change Lock Status this employee?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="ChangeStatusOfLockAccount">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <!-- Modal For Delete Employee -->
+        <div class="modal fade" id="DeleteEmployee" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    
+                    <div class="modal-body">
+                        Are you sure to delete this employee?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="DeletethisEmployeeId">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $(".point02").addClass("active");
+    })
+        let table = $('#DatatableForEmployeesList').DataTable();
+
+    // Js Call For Lock Account
+    var EmployeeId;
+    $(".LockUnLockAccount").click(function(){
+        EmployeeId=$(this).val()
+    });
+
+
+    // Ajax Call For Change Lock and Unlock
+    $("#ChangeStatusOfLockAccount").click(function(){
+        $.ajax({
+            url: '/Admin/Admin/ChangeLockStatus',
+            data: {
+                EmployeeId: EmployeeId,
+            },
+            type: "POST",
+            dataType: "json",
+            success: function (data) {
+                window.location.reload();
+            },
+        })
+    });
+    // Js Call For Delete Account
+    var EmployeeId;
+    $(".DeleteEmployeeId").click(function(){
+        EmployeeId=$(this).val()
+    });
+
+
+    // Ajax Call For Change Lock and Unlock
+    $("#DeletethisEmployeeId").click(function(){
+        $.ajax({
+            url: '/Admin/Admin/DeleteEmployee',
+            data: {
+                EmployeeId: EmployeeId,
+            },
+            type: "POST",
+            dataType: "json",
+            success: function (data) {
+                window.location.reload();
+            },
+        })
+    });
+</script>
